@@ -1,0 +1,8 @@
+<fa-icon [icon]="properties.icon" class="d-inline-block"
+    [style.color]="properties.color"
+    [style.font-size.px]="properties.size"
+    [style.opacity]="properties.opacity ? properties.opacity : 1"
+    ></fa-icon>
+<div class="label" *ngIf="properties.label">
+    <span [style.font-size.px]="properties.size * 0.4">{{properties.label}}</span>
+</div>

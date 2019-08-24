@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Trip } from 'src/models/trip';
 
 @Component({
   selector: 'rbc-root',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'rebalancer-ui';
+
 }
+

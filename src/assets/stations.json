@@ -1,0 +1,135 @@
+[
+    {
+        "name": "001_JARDINES DE PEREDA",
+        "coordinates": [
+            -3.8021,
+            43.461719
+        ]
+    },
+    {
+        "name": "016_SEVERO OCHOA",
+        "coordinates": [
+            -3.87139068298249,
+            43.452813054952294
+        ]
+    },
+    {
+        "name": "001_JARDINES DE PEREDA",
+        "coordinates": [
+            -3.802347,
+            43.461420000000004
+        ]
+    },
+    {
+        "name": "002_PLAZA DE LAS BRISAS",
+        "coordinates": [
+            -3.78578134528458,
+            43.474412670470294
+        ]
+    },
+    {
+        "name": "003_PARQUE LAS LLAMAS",
+        "coordinates": [
+            -3.79806387098462,
+            43.475732260369995
+        ]
+    },
+    {
+        "name": "004_CORMORÁN",
+        "coordinates": [
+            -3.78865314567001,
+            43.4784718110308
+        ]
+    },
+    {
+        "name": "005_GLORIETA DE LOS DELFINES",
+        "coordinates": [
+            -3.79285449619735,
+            43.4719661074837
+        ]
+    },
+    {
+        "name": "006_FACULDAD DE CIENCIAS",
+        "coordinates": [
+            -3.8005864589007903,
+            43.471106111710796
+        ]
+    },
+    {
+        "name": "007_FACULTAD DE DERECHO",
+        "coordinates": [
+            -3.8064994775302594,
+            43.4701661089386
+        ]
+    },
+    {
+        "name": "008_PLAZA DE ITALIA",
+        "coordinates": [
+            -3.78134613485541,
+            43.471804825752706
+        ]
+    },
+    {
+        "name": "009_AVENIDA DE LA MAGDALENA",
+        "coordinates": [
+            -3.77327597557961,
+            43.469149414003496
+        ]
+    },
+    {
+        "name": "010_PLAZA DE SAN MARTIN",
+        "coordinates": [
+            -3.78800547922826,
+            43.4635521249485
+        ]
+    },
+    {
+        "name": "011_PUERTO CHICO",
+        "coordinates": [
+            -3.79724144946775,
+            43.4621430815773
+        ]
+    },
+    {
+        "name": "012_CALLE ALTA",
+        "coordinates": [
+            -3.8248012423496096,
+            43.457966252222796
+        ]
+    },
+    {
+        "name": "013_CALLE DE SAN FERNANDO",
+        "coordinates": [
+            -3.81797824491875,
+            43.4607255432349
+        ]
+    },
+    {
+        "name": "014_ATILANO RODRIGUEZ",
+        "coordinates": [
+            -3.8104683913312996,
+            43.4583838909468
+        ]
+    },
+    {
+        "name": "015_AV.DE LOS CASTROS 141",
+        "coordinates": [
+            -3.830683,
+            43.463985
+        ]
+    },
+    {
+        "name": "015_AV.DE LOS CASTROS 141",
+        "coordinates": [
+            -3.825767,
+            43.465323
+        ]
+    },
+    {
+        "name": "017_RUCANDIAL",
+        "coordinates": [
+            -3.86690066866145,
+            43.4548260614091
+        ]
+    }
+]
