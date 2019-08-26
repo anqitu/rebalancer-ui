@@ -1,40 +1,41 @@
 import { Injectable } from '@angular/core';
 import { Trip } from 'src/models/trip';
-import { Station } from 'src/models/station';
 import * as uuid from 'uuid/v4';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TripService {
 
-  private trips: Trip[] = [];
+  private trips: BehaviorSubject<Trip[]>;
+  private trips$: Observable<Trip[]>;
+  private tripsBuffer: Trip[] = [];
 
-  constructor() { }
-
-  public getTrips() {
-    return this.trips;
+  constructor() {
+    this.trips = new BehaviorSubject<Trip[]>(this.tripsBuffer);
+    this.trips$ = this.trips.asObservable();
   }
 
-  public createTrip(source: Station, destination: Station, count: number) {
+  public getTrips() {
+    return this.trips$;
+  }
+
+  public createTrip(sourceId: string, destinationId: string, count: number): Trip {
     const trip: Trip = {
       id: uuid(),
       progress: 0,
-      time: (new Date).getTime(),
       count,
-      source: {
-        station: source,
-        oldCount: source.count,
-        newCount: source.count - count
-      },
-      destination: {
-        station: destination,
-        oldCount: destination.count,
-        newCount: destination.count + count
-      }
+      sourceId,
+      destinationId
     };
-    this.trips.push(trip);
+    this.tripsBuffer.push(trip);
     return trip;
+  }
+
+  public startTrips() {
+    this.trips.next(this.tripsBuffer);
+    this.tripsBuffer = [];
   }
 
 }

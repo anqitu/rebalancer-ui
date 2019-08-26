@@ -5,9 +5,10 @@ import { DataService } from '../data.service';
 import { Station } from 'src/models/station';
 import { MarkerComponent, MarkerProperties } from '../marker/marker.component';
 import * as turf from '@turf/turf';
-import { faAngleUp, faCircle, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { Trip } from 'src/models/trip';
 import { TripService } from '../trip.service';
+import { skip } from 'rxjs/operators';
 
 @Component({
   selector: 'rbc-map',
@@ -18,6 +19,7 @@ export class MapComponent implements OnInit {
 
   map: mapbox.Map;
   stationMarkers: StationMarker[];
+  stations: Station[];
 
   maxStationCount: number;
   minStationCount: number;
@@ -54,12 +56,22 @@ export class MapComponent implements OnInit {
   ) {
     (mapbox as any).accessToken = environment.mapboxToken;
     this.markerComponentFactory = this.resolver.resolveComponentFactory(MarkerComponent);
-  }
 
-  ngOnInit() {
-    this.dataService.getStations().then(stations => {
+    this.tripService.getTrips().subscribe(trips => {
+      trips.forEach(trip => {
+        this.drawTrip(trip);
+      });
+    });
+
+    this.dataService.getStations().pipe(skip(1)).subscribe(stations => {
+
+      this.stations = stations;
       this.mapInitialBounds = this.buildMapBounds(stations.map(station => station.coordinates));
-      this.map = this.buildMap(this.mapInitialBounds.getCenter());
+
+      if (!this.map) {
+        this.map = this.buildMap(this.mapInitialBounds.getCenter());
+      }
+
       this.fitMapToBounds(this.mapInitialBounds);
 
       this.maxStationCount = stations.reduce((prev, current) => {
@@ -70,17 +82,18 @@ export class MapComponent implements OnInit {
         return current.count < prev ? current.count : prev;
       }, this.maxStationCount);
 
-      this.stationMarkers = this.drawStationMarkers(stations);
+      if (this.stationMarkers) {
+        this.stationMarkers.forEach(stationMarker => {
+          stationMarker.component.destroy();
+          stationMarker.marker.remove();
+        });
+      }
 
-      this.map.on('load', () => {
-        setInterval(() => {
-          const source = this.getRandomStation(stations);
-          const destination = this.getRandomStation(stations);
-          const trip = this.tripService.createTrip(source, destination, Math.floor(source.count * 0.25));
-          this.drawTrip(trip);
-        }, 1000);
-      });
+      this.stationMarkers = this.drawStationMarkers(stations);
     });
+  }
+
+  ngOnInit() {
   }
 
   private buildMapBounds(coordinates: mapbox.LngLatLike[]) {
@@ -106,11 +119,6 @@ export class MapComponent implements OnInit {
     this.resizeDebounceTimeout = setTimeout(() => {
       this.fitMapToBounds(this.mapInitialBounds);
     }, 1000);
-  }
-
-  private getRandomStation(stations: Station[]) {
-    return stations[Math.floor(Math.random() * stations.length)];
-
   }
 
   private drawStationMarkers(stations: Station[]) {
@@ -195,15 +203,22 @@ export class MapComponent implements OnInit {
     sourceStationMarker.component.instance.properties.label = newCount + '';
   }
 
+  getStation(stationId: string) {
+    return this.stations.find(station => station.id === stationId);
+  }
+
   drawTrip(trip: Trip) {
+    const source = this.getStation(trip.sourceId);
+    const destination = this.getStation(trip.destinationId);
+
     const path: any = this.buildLineStringGeoJSON([
-      trip.source.station.coordinates,
-      trip.destination.station.coordinates
+      source.coordinates,
+      destination.coordinates
     ]);
 
     const trail: any = {
       type: 'FeatureCollection',
-      features: [this.buildLineStringGeoJSON([trip.source.station.coordinates])]
+      features: [this.buildLineStringGeoJSON([source.coordinates])]
     };
 
     this.map.addLayer({
@@ -221,14 +236,15 @@ export class MapComponent implements OnInit {
     });
 
     const distance = turf.lineDistance(path, { units: 'kilometers' });
-    const truckMarker = this.drawTruck(trip.source.station.coordinates, trip.count);
+    const truckMarker = this.drawTruck(source.coordinates, trip.count);
     const step = distance / this.trailAnimationFrames;
 
     let frame = 1;
     const interval = setInterval(() => {
 
       if (frame === 2) {
-        this.setStationMarkerCount(trip.source.station.id, trip.source.newCount);
+        source.count -= trip.count;
+        this.setStationMarkerCount(source.id, source.count);
       }
 
       const nextCoordinates = turf.along(path, step * frame, {
@@ -246,7 +262,8 @@ export class MapComponent implements OnInit {
 
       if (frame > this.trailAnimationFrames) {
         clearInterval(interval);
-        this.setStationMarkerCount(trip.destination.station.id, trip.destination.newCount);
+        destination.count += trip.count;
+        this.setStationMarkerCount(destination.id, destination.count);
         truckMarker.remove();
 
         this.map.removeLayer(trip.id);

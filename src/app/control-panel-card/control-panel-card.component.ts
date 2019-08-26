@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Trip } from 'src/models/trip';
-import { TripService } from '../trip.service';
 import * as moment from 'moment';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { RebalanceService } from '../rebalance.service';
+import { DataService } from '../data.service';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -12,7 +12,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class ControlPanelCardComponent implements OnInit {
 
   intervalOptions: Interval[] = [];
-  trips: Trip[];
 
   cycles = -1;
   hasRebalancedForCycle = false;
@@ -20,8 +19,8 @@ export class ControlPanelCardComponent implements OnInit {
 
   settingsForm: FormGroup;
 
-  constructor(private tripService: TripService, private formBuilder: FormBuilder) {
-    this.trips = tripService.getTrips();
+  constructor(private formBuilder: FormBuilder, private rebalanceService: RebalanceService, private dataService: DataService) {
+
     for (let hour = 1; hour < 13; hour++) {
       this.intervalOptions.push({
         hours: hour,
@@ -40,13 +39,21 @@ export class ControlPanelCardComponent implements OnInit {
   }
 
   nextCycle() {
-    this.cycles += 1;
+
+    // start
+    if (this.cycles === -1) {
+      this.cycles += 1;
+      return;
+    }
+
     this.hasRebalancedForCycle = false;
     this.time = moment(this.time).add(this.settingsForm.get('interval').value, 'hours');
+    this.dataService.randomizeStationCount();
   }
 
   rebalance() {
     this.hasRebalancedForCycle = true;
+    this.rebalanceService.rebalance();
   }
 
 }
