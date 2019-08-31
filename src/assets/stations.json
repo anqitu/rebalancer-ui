@@ -1,135 +1,209 @@
 [
     {
-        "name": "001_JARDINES DE PEREDA",
+        "name": "Putney Pier, Wandsworth",
+        "id": 302,
+        "bike_stands": 28,
         "coordinates": [
-            -3.8021,
-            43.461719
+            -0.21657300000000002,
+            51.466907
         ]
     },
     {
-        "name": "016_SEVERO OCHOA",
+        "name": "Putney Bridge Station, Fulham",
+        "id": 607,
+        "bike_stands": 21,
         "coordinates": [
-            -3.87139068298249,
-            43.452813054952294
+            -0.210279,
+            51.468814
         ]
     },
     {
-        "name": "001_JARDINES DE PEREDA",
+        "name": "Morie Street, Wandsworth",
+        "id": 629,
+        "bike_stands": 28,
         "coordinates": [
-            -3.802347,
-            43.461420000000004
+            -0.190184,
+            51.459953000000006
         ]
     },
     {
-        "name": "002_PLAZA DE LAS BRISAS",
+        "name": "South Park, Sands End",
+        "id": 636,
+        "bike_stands": 27,
         "coordinates": [
-            -3.78578134528458,
-            43.474412670470294
+            -0.193502,
+            51.467064
         ]
     },
     {
-        "name": "003_PARQUE LAS LLAMAS",
+        "name": "Peterborough Road, Sands End",
+        "id": 648,
+        "bike_stands": 30,
         "coordinates": [
-            -3.79806387098462,
-            43.475732260369995
+            -0.196274,
+            51.46904
         ]
     },
     {
-        "name": "004_CORMORÁN",
+        "name": "Broomhouse Lane, Parsons Green",
+        "id": 656,
+        "bike_stands": 29,
         "coordinates": [
-            -3.78865314567001,
-            43.4784718110308
+            -0.19913499999999998,
+            51.468418
         ]
     },
     {
-        "name": "005_GLORIETA DE LOS DELFINES",
+        "name": "Smugglers Way, Wandsworth",
+        "id": 665,
+        "bike_stands": 28,
         "coordinates": [
-            -3.79285449619735,
-            43.4719661074837
+            -0.191722,
+            51.461083
         ]
     },
     {
-        "name": "006_FACULDAD DE CIENCIAS",
+        "name": "Esmond Street, Putney",
+        "id": 678,
+        "bike_stands": 30,
         "coordinates": [
-            -3.8005864589007903,
-            43.471106111710796
+            -0.211468,
+            51.462312
         ]
     },
     {
-        "name": "007_FACULTAD DE DERECHO",
+        "name": "Neville Gill Close, Wandsworth",
+        "id": 684,
+        "bike_stands": 32,
         "coordinates": [
-            -3.8064994775302594,
-            43.4701661089386
+            -0.195197,
+            51.454752
         ]
     },
     {
-        "name": "008_PLAZA DE ITALIA",
+        "name": "Osiers Road, Wandsworth",
+        "id": 685,
+        "bike_stands": 30,
         "coordinates": [
-            -3.78134613485541,
-            43.471804825752706
+            -0.198735,
+            51.46067
         ]
     },
     {
-        "name": "009_AVENIDA DE LA MAGDALENA",
+        "name": "Northfields, Wandsworth",
+        "id": 688,
+        "bike_stands": 28,
         "coordinates": [
-            -3.77327597557961,
-            43.469149414003496
+            -0.200667,
+            51.460951
         ]
     },
     {
-        "name": "010_PLAZA DE SAN MARTIN",
+        "name": "Felsham Road, Putney",
+        "id": 693,
+        "bike_stands": 18,
         "coordinates": [
-            -3.78800547922826,
-            43.4635521249485
+            -0.21561799999999998,
+            51.464786
         ]
     },
     {
-        "name": "011_PUERTO CHICO",
+        "name": "Putney Rail Station, Putney",
+        "id": 694,
+        "bike_stands": 20,
         "coordinates": [
-            -3.79724144946775,
-            43.4621430815773
+            -0.21652600000000002,
+            51.460716999999995
         ]
     },
     {
-        "name": "012_CALLE ALTA",
+        "name": "Mexfield Road, East Putney",
+        "id": 704,
+        "bike_stands": 18,
         "coordinates": [
-            -3.8248012423496096,
-            43.457966252222796
+            -0.202802,
+            51.45682
         ]
     },
     {
-        "name": "013_CALLE DE SAN FERNANDO",
+        "name": "Disraeli Road, Putney",
+        "id": 708,
+        "bike_stands": 33,
         "coordinates": [
-            -3.81797824491875,
-            43.4607255432349
+            -0.21614499999999998,
+            51.46161
         ]
     },
     {
-        "name": "014_ATILANO RODRIGUEZ",
+        "name": "Montserrat Road , Putney",
+        "id": 709,
+        "bike_stands": 23,
         "coordinates": [
-            -3.8104683913312996,
-            43.4583838909468
+            -0.21555,
+            51.463211
         ]
     },
     {
-        "name": "015_AV.DE LOS CASTROS 141",
+        "name": "Stephendale Road, Sands End",
+        "id": 723,
+        "bike_stands": 48,
         "coordinates": [
-            -3.830683,
-            43.463985
+            -0.19034600000000002,
+            51.46822
         ]
     },
     {
-        "name": "015_AV.DE LOS CASTROS 141",
+        "name": "Putney Bridge Road, East Putney",
+        "id": 728,
+        "bike_stands": 29,
         "coordinates": [
-            -3.825767,
-            43.465323
+            -0.20624,
+            51.461999
         ]
     },
     {
-        "name": "017_RUCANDIAL",
+        "name": "Oxford Road, Putney",
+        "id": 743,
+        "bike_stands": 29,
         "coordinates": [
-            -3.86690066866145,
-            43.4548260614091
+            -0.21260700000000002,
+            51.460792
+        ]
+    },
+    {
+        "name": "Manfred Road, East Putney",
+        "id": 752,
+        "bike_stands": 29,
+        "coordinates": [
+            -0.206002,
+            51.458164000000004
+        ]
+    },
+    {
+        "name": "Ranelagh Gardens, Fulham",
+        "id": 765,
+        "bike_stands": 39,
+        "coordinates": [
+            -0.206827,
+            51.467601
+        ]
+    },
+    {
+        "name": "Ram Street, Wandsworth",
+        "id": 766,
+        "bike_stands": 25,
+        "coordinates": [
+            -0.192165,
+            51.457529
+        ]
+    },
+    {
+        "name": "Santos Road, Wandsworth",
+        "id": 767,
+        "bike_stands": 30,
+        "coordinates": [
+            -0.20080599999999998,
+            51.457059
         ]
     }
 ]
