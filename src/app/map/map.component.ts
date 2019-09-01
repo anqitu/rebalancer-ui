@@ -9,6 +9,7 @@ import { faCircle, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { Trip } from 'src/models/trip';
 import { TripService } from '../trip.service';
 import { skip } from 'rxjs/operators';
+import { StationService } from '../station.service';
 
 @Component({
   selector: 'rbc-map',
@@ -52,18 +53,19 @@ export class MapComponent implements OnInit {
   constructor(
     private dataService: DataService,
     private resolver: ComponentFactoryResolver,
-    private tripService: TripService
+    private tripService: TripService,
+    private stationService: StationService
   ) {
     (mapbox as any).accessToken = environment.mapboxToken;
     this.markerComponentFactory = this.resolver.resolveComponentFactory(MarkerComponent);
 
-    this.tripService.getTrips().subscribe(trips => {
+    this.tripService.trips$.subscribe(trips => {
       trips.forEach(trip => {
         this.drawTrip(trip);
       });
     });
 
-    this.dataService.getStations().pipe(skip(1)).subscribe(stations => {
+    this.stationService.stations$.pipe(skip(1)).subscribe(stations => {
 
       this.stations = stations;
       this.mapInitialBounds = this.buildMapBounds(stations.map(station => station.coordinates));

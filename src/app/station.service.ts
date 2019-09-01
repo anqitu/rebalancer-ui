@@ -16,6 +16,10 @@ export class StationService {
     this.stations$ = this.stations.asObservable();
   }
 
+  public setStations(stations: Station[]) {
+    this.stations.next(stations);
+  }
+
   public updateStations(updates: StationUpdate[]) {
     const stations = this.stations.getValue();
     updates.forEach(update => {

@@ -5,8 +5,8 @@
       <strong class="border-bottom py-1 mb-3 d-block">SETTINGS</strong>
       <form [formGroup]="settingsForm">
         <div class="form-group">
-          <label for="interval">Interval</label>
-          <select class="custom-select" formControlName="interval" id="interval">
+          <label for="interval-hour">Interval</label>
+          <select class="custom-select" formControlName="intervalHour" id="interval-hour">
             <option [value]="option.hours" *ngFor="let option of intervalOptions">{{option.label}}</option>
           </select>
         </div>
@@ -24,6 +24,20 @@
             </div>
           </div>
         </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="budget-per-cycle">Budget Per Cycle</label>
+              <input type="number" class="form-control" id="budget-per-cycle" placeholder="Budget Per Cycle" formControlName="budgetPerCycle">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="cost-coef">Cost Coefficient</label>
+              <input type="number" class="form-control" id="cost-coef" placeholder="Cost Coefficient" formControlName="costCoef">
+            </div>
+          </div>
+        </div>
       </form>
     </div>
     <div class="py-2">
@@ -32,48 +46,18 @@
         <span>Current Time</span>
         <h1 class="display-3">{{time | amDateFormat : 'hh:ss:mm'}}</h1>
       </div>
-      <button class="btn btn-primary btn-block" *ngIf="cycles === -1 && !hasRebalancedForCycle" (click)="nextCycle()">START</button>
-      <button class="btn btn-primary btn-block" *ngIf="cycles > -1 && hasRebalancedForCycle" (click)="nextCycle()">NEXT CYCLE</button>
-      <button class="btn btn-primary btn-block" *ngIf="cycles > -1 && !hasRebalancedForCycle" (click)="rebalance()">REBALANCE</button>
+      <button class="btn btn-primary btn-block" (click)="step(nextStatus)">{{statusLabels[nextStatus]}}</button>
     </div>
     <div class="py-2">
       <strong class="border-bottom py-1 mb-3 d-block">STATISTICS</strong>
-      <div class="row pb-3">
-        <div class="col">
-          <div>100</div>
-          <small>Bikes Used in Current Cycle</small>
-        </div>
-        <div class="col">
-          <div>100</div>
-          <small>Total Bikes Used</small>
-        </div>
-      </div>
-      <div class="row pb-3">
-        <div class="col">
-          <div>100</div>
-          <small>Bikes Rebalanced in Current Cycle</small>
-        </div>
-        <div class="col">
-          <div>100</div>
-          <small>Total Bikes Rebalanced</small>
-        </div>
-      </div>
-      <div class="row pb-3">
-        <div class="col">
-          <div>500</div>
-          <small>Rebalance Cost in Current Cycle</small>
-        </div>
-        <div class="col">
-          <div>100</div>
-          <small>Total Rebalance Cost</small>
-        </div>
-      </div>
-      <div class="row pb-3">
-        <div class="col">
-          <div>500</div>
-          <small>Drift</small>
-        </div>
-      </div>
+      <table class="table table-sm">
+        <tbody>
+          <tr *ngFor="let stat of statistics">
+            <td>{{stat.name}}</td>
+            <td>{{stat.value | number}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
