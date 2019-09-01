@@ -1,44 +1,31 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Station } from 'src/models/station';
-import * as uuid from 'uuid/v4';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { StepResponse } from 'src/models/step.response';
+import { environment } from 'src/environments/environment';
+import { Status, StatusResponse } from 'src/models/status.response';
+import { SettingsService } from './settings.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
-  private stations: BehaviorSubject<Station[]>;
-  private stations$: Observable<Station[]>;
+  constructor(
+    private http: HttpClient,
+    private settingsService: SettingsService
+  ) { }
 
-  constructor(private http: HttpClient) {
-    this.stations = new BehaviorSubject([]);
-    this.stations$ = this.stations.asObservable();
-
-    this.http.get<Station[]>('./assets/stations.json').toPromise().then(stations => {
-      stations.forEach(station => {
-        station.id = uuid();
-        station.count = Math.floor(Math.random() * 100);
-      });
-      this.stations.next(stations);
-    });
+  public getStatus(): Promise<StatusResponse> {
+    return this.http.get<StatusResponse>(`${environment.serverEndpoint}/status`).toPromise();
   }
 
-  public getStations() {
-    return this.stations$;
+  public step(step: Status): Promise<StepResponse> {
+
+    const body = step === 'start' ? {
+      settings: this.settingsService.getSettings()
+    } : {};
+
+    return this.http.post<StepResponse>(`${environment.serverEndpoint}/step/${step}`, body).toPromise();
   }
 
-  public getRandomStation() {
-    const stations = this.stations.getValue();
-    return stations[Math.floor(Math.random() * stations.length)];
-  }
-
-  public randomizeStationCount() {
-    const stations = this.stations.getValue();
-    stations.forEach(station => {
-      station.count = Math.floor(Math.random() * 100);
-    });
-    this.stations.next(stations);
-  }
 }
