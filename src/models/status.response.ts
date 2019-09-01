@@ -10,5 +10,5 @@ export interface StatusResponse {
   nextStatus: Status;
   settings: Settings;
   stations: Station[];
-  statistics: StatisticItem[];
+  statistics?: StatisticItem[];
 }
