@@ -79,6 +79,8 @@ export class ControlPanelCardComponent implements OnInit {
 
       if (this.nextStatus !== 'start') {
         this.settingsForm.disable();
+      } else {
+        this.settingsForm.enable();
       }
     });
   }
