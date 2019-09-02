@@ -11,6 +11,9 @@ import { TripService } from '../trip.service';
 import { skip } from 'rxjs/operators';
 import { StationService } from '../station.service';
 
+export const TRAIL_ANIMATION_FRAMES = 50;
+export const TRAIL_ANIMATION_FRAME_RATE = 30;
+
 @Component({
   selector: 'rbc-map',
   templateUrl: './map.component.html',
@@ -40,8 +43,6 @@ export class MapComponent implements OnInit {
   stationColor = '#76DFFF';
   stationOpacity = 0.6;
 
-  trailAnimationFrames = 50;
-  trailAnimationFrameRate = 30;
   trailColor = '#3A73BD';
   trailWidth = 4;
 
@@ -239,7 +240,7 @@ export class MapComponent implements OnInit {
 
     const distance = turf.lineDistance(path, { units: 'kilometers' });
     const truckMarker = this.drawTruck(source.coordinates, trip.count);
-    const step = distance / this.trailAnimationFrames;
+    const step = distance / TRAIL_ANIMATION_FRAMES;
 
     let frame = 1;
     const interval = setInterval(() => {
@@ -262,7 +263,7 @@ export class MapComponent implements OnInit {
 
       frame += 1;
 
-      if (frame > this.trailAnimationFrames) {
+      if (frame > TRAIL_ANIMATION_FRAMES) {
         clearInterval(interval);
         destination.count += trip.count;
         this.setStationMarkerCount(destination.id, destination.count);
@@ -270,7 +271,7 @@ export class MapComponent implements OnInit {
 
         this.map.removeLayer(trip.id);
       }
-    }, this.trailAnimationFrameRate);
+    }, TRAIL_ANIMATION_FRAME_RATE);
   }
 
 }

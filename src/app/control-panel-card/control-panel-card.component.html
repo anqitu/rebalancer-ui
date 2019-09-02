@@ -46,12 +46,14 @@
         <span>Current Time</span>
         <h1 class="display-3">{{time | amDateFormat : 'hh:ss:mm'}}</h1>
       </div>
-      <button class="btn btn-primary btn-block" (click)="step(nextStatus)">{{statusLabels[nextStatus]}}</button>
+      <button class="btn btn-primary btn-block" (click)="step(nextStatus)" [disabled]="disableStep">{{statusLabels[nextStatus]}}</button>
+      <button class="btn btn-primary btn-block" (click)="step('finish')" [disabled]="currentStatus !== 'rides'">Finish</button>
     </div>
-    <div class="py-2">
+    <div class="py-2" *ngIf="statistics">
       <strong class="border-bottom py-1 mb-3 d-block">STATISTICS</strong>
-      <table class="table table-sm">
-        <tbody>
+      <span class="font-weight-normal">{{currentStatus === "finish" ? "Simulation Result" : "Current Cycle"}}</span>
+      <table class="table table-sm mt-2">
+        <tbody class="font-weight-light">
           <tr *ngFor="let stat of statistics">
             <td>{{stat.name}}</td>
             <td>{{stat.value | number}}</td>

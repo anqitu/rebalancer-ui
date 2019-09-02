@@ -6,6 +6,7 @@ import { Status } from 'src/models/status.response';
 import { TripService } from '../trip.service';
 import { StationService } from '../station.service';
 import { StatisticItem } from 'src/models/statistic-item';
+import { TRAIL_ANIMATION_FRAMES, TRAIL_ANIMATION_FRAME_RATE } from '../map/map.component';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -16,6 +17,7 @@ export class ControlPanelCardComponent implements OnInit {
 
   intervalOptions: Interval[] = [];
 
+  disableStep = false;
   currentStatus: Status;
   nextStatus: Status;
   time = moment('12', 'HH');
@@ -66,7 +68,9 @@ export class ControlPanelCardComponent implements OnInit {
       this.statistics = response.statistics;
 
       if (response.trips) {
+        this.disableStep = true;
         this.tripService.setTrips(response.trips);
+        setTimeout(() => this.disableStep = false, TRAIL_ANIMATION_FRAMES * TRAIL_ANIMATION_FRAME_RATE);
       }
 
       if (response.stations && !response.trips) {

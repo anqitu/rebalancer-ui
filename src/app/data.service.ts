@@ -4,6 +4,7 @@ import { StepResponse } from 'src/models/step.response';
 import { environment } from 'src/environments/environment';
 import { Status, StatusResponse } from 'src/models/status.response';
 import { SettingsService } from './settings.service';
+import { Result } from 'src/models/result.response';
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +28,9 @@ export class DataService {
 
     return this.http.post<StepResponse>(`${environment.serverEndpoint}/step/${step}`, body).toPromise();
   }
+
+  // public finish(): Promise<Result> {
+  //   return this.http.post<Result>(`${environment.serverEndpoint}/finish`, {}).toPromise();
+  // }
 
 }
