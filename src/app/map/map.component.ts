@@ -10,9 +10,10 @@ import { Trip } from 'src/models/trip';
 import { TripService } from '../trip.service';
 import { skip } from 'rxjs/operators';
 import { StationService } from '../station.service';
+import { Feature } from '@turf/turf';
 
-export const TRAIL_ANIMATION_FRAMES = 50;
-export const TRAIL_ANIMATION_FRAME_RATE = 30;
+export const TRAIL_ANIMATION_FRAMES = 10;
+export const TRAIL_ANIMATION_FRAME_RATE = 500;
 
 @Component({
   selector: 'rbc-map',
@@ -23,7 +24,8 @@ export class MapComponent implements OnInit {
 
   map: mapbox.Map;
   stationMarkers: StationMarker[];
-  stations: Station[];
+  stationsMap: {[stationId in string]: Station};
+  tripDrawings: TripDrawing[];
 
   maxStationCount: number;
   minStationCount: number;
@@ -61,14 +63,15 @@ export class MapComponent implements OnInit {
     this.markerComponentFactory = this.resolver.resolveComponentFactory(MarkerComponent);
 
     this.tripService.trips$.subscribe(trips => {
-      trips.forEach(trip => {
-        this.drawTrip(trip);
-      });
+      this.drawTripDrawings(trips.map(trip => this.buildTripDrawing(trip)));
     });
 
     this.stationService.stations$.pipe(skip(1)).subscribe(stations => {
 
-      this.stations = stations;
+      this.stationsMap = stations.reduce((map, station) => {
+        map[station.id] = station;
+        return map;
+      }, {});
       this.mapInitialBounds = this.buildMapBounds(stations.map(station => station.coordinates));
 
       if (!this.map) {
@@ -183,7 +186,7 @@ export class MapComponent implements OnInit {
         coordinates
       },
       properties: {}
-    };
+    } as Feature;
   }
 
   drawTruck(coordinates: mapbox.LngLatLike, count: number) {
@@ -206,74 +209,96 @@ export class MapComponent implements OnInit {
     sourceStationMarker.component.instance.properties.label = newCount + '';
   }
 
-  getStation(stationId: string) {
-    return this.stations.find(station => station.id === stationId);
-  }
-
-  drawTrip(trip: Trip) {
-    const source = this.getStation(trip.sourceId);
-    const destination = this.getStation(trip.destinationId);
-
-    const path: any = this.buildLineStringGeoJSON([
-      source.coordinates,
-      destination.coordinates
-    ]);
-
-    const trail: any = {
+  buildTripDrawing(trip: Trip): TripDrawing {
+    const source = this.stationsMap[trip.sourceId];
+    const destination = this.stationsMap[trip.destinationId];
+    const trail = {
       type: 'FeatureCollection',
       features: [this.buildLineStringGeoJSON([source.coordinates])]
     };
-
-    this.map.addLayer({
-      id: trip.id,
-      type: 'line',
-      source: {
-        type: 'geojson',
-        data: trail
-      },
-      paint: {
-        'line-color': this.trailColor,
-        'line-width': this.trailWidth,
-        'line-dasharray': [2, 2]
-      }
-    });
-
+    const path = this.buildLineStringGeoJSON([
+      source.coordinates,
+      destination.coordinates
+    ]);
     const distance = turf.lineDistance(path, { units: 'kilometers' });
-    const truckMarker = this.drawTruck(source.coordinates, trip.count);
-    const step = distance / TRAIL_ANIMATION_FRAMES;
+    return {
+      trip,
+      source,
+      destination,
+      trail,
+      path,
+      distance,
+      truckMarker: this.drawTruck(source.coordinates, trip.count),
+      step: distance / TRAIL_ANIMATION_FRAMES
+    };
+  }
+
+  drawTripDrawings(drawings: TripDrawing[]) {
+    drawings.forEach(drawing => {
+      this.map.addLayer({
+        id: drawing.trip.id,
+        type: 'line',
+        source: {
+          type: 'geojson',
+          data: drawing.trail
+        },
+        paint: {
+          'line-color': this.trailColor,
+          'line-width': this.trailWidth,
+          'line-dasharray': [2, 2]
+        }
+      });
+    });
 
     let frame = 1;
     const interval = setInterval(() => {
 
       if (frame === 2) {
-        source.count -= trip.count;
-        this.setStationMarkerCount(source.id, source.count);
+        drawings.forEach(drawing => {
+          drawing.source.count -= drawing.trip.count;
+          this.setStationMarkerCount(drawing.source.id, drawing.source.count);
+        });
       }
 
-      const nextCoordinates = turf.along(path, step * frame, {
-        units: 'kilometers'
-      }).geometry.coordinates as mapbox.LngLatLike;
+      drawings.forEach(drawing => {
+        const nextCoordinates = turf.along(drawing.path, drawing.step * frame, {
+          units: 'kilometers'
+        }).geometry.coordinates as mapbox.LngLatLike;
 
-      truckMarker.setLngLat(nextCoordinates);
-      trail.features[0].geometry.coordinates.push(nextCoordinates);
+        drawing.truckMarker.setLngLat(nextCoordinates);
+        drawing.trail.features[0].geometry.coordinates.push(nextCoordinates);
 
-      // update trail
-      const trailSource = this.map.getSource(trip.id) as mapbox.GeoJSONSource;
-      trailSource.setData(path);
+        // update trail
+        const trailSource = this.map.getSource(drawing.trip.id) as mapbox.GeoJSONSource;
+        trailSource.setData(drawing.path);
+      });
 
       frame += 1;
 
       if (frame > TRAIL_ANIMATION_FRAMES) {
         clearInterval(interval);
-        destination.count += trip.count;
-        this.setStationMarkerCount(destination.id, destination.count);
-        truckMarker.remove();
 
-        this.map.removeLayer(trip.id);
+        drawings.forEach(drawing => {
+          drawing.destination.count += drawing.trip.count;
+          this.setStationMarkerCount(drawing.destination.id, drawing.destination.count);
+          drawing.truckMarker.remove();
+          this.map.removeLayer(drawing.trip.id);
+        });
       }
     }, TRAIL_ANIMATION_FRAME_RATE);
   }
 
+}
+
+interface TripDrawing {
+  trip: Trip;
+  source: Station;
+  destination: Station;
+  path: any;
+  trail: any;
+  distance: number;
+  truckMarker: mapbox.Marker;
+  step: number;
 }
 
 interface StationMarker {
