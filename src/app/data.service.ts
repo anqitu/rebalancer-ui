@@ -22,15 +22,11 @@ export class DataService {
 
   public step(step: Status): Promise<StepResponse> {
 
+    console.log(step);
     const body = step === 'start' ? {
       settings: this.settingsService.getSettings()
     } : {};
-
+    console.log(body);
     return this.http.post<StepResponse>(`${environment.serverEndpoint}/step/${step}`, body).toPromise();
   }
-
-  // public finish(): Promise<Result> {
-  //   return this.http.post<Result>(`${environment.serverEndpoint}/finish`, {}).toPromise();
-  // }
-
 }
