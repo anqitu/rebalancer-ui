@@ -16,6 +16,10 @@ export class MarkerComponent implements OnInit {
   ngOnInit() {
   }
 
+  updateProperties(properties: Partial<MarkerProperties>) {
+    this.properties = {...this.properties, ...properties};
+  }
+
 }
 
 export interface MarkerProperties {
@@ -24,4 +28,5 @@ export interface MarkerProperties {
   color?: string;
   label?: string;
   opacity?: number;
+  hidden?: boolean;
 }

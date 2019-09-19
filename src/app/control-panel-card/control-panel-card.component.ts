@@ -6,7 +6,8 @@ import { Status } from 'src/models/status.response';
 import { TripService } from '../trip.service';
 import { StationService } from '../station.service';
 import { StatisticItem } from 'src/models/statistic-item';
-import { TRAIL_ANIMATION_FRAMES, TRAIL_ANIMATION_FRAME_RATE } from '../map/map.component';
+import { SettingsService } from '../settings.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -33,11 +34,14 @@ export class ControlPanelCardComponent implements OnInit {
 
   statistics: StatisticItem[] = [];
 
+  exportUrl = `${environment.serverEndpoint}/download`;
+
   constructor(
     private formBuilder: FormBuilder,
     private dataService: DataService,
     private tripService: TripService,
-    private stationService: StationService
+    private stationService: StationService,
+    private settingsService: SettingsService
   ) {
 
     this.buildIntervalOptions(12);
@@ -47,6 +51,10 @@ export class ControlPanelCardComponent implements OnInit {
       offPeakCost: [],
       budgetPerCycle: [],
       costCoef: []
+    });
+
+    this.settingsForm.valueChanges.subscribe(() => {
+      this.settingsService.setSettings(this.settingsForm.value);
     });
   }
 
@@ -60,6 +68,7 @@ export class ControlPanelCardComponent implements OnInit {
   }
 
   step(step: Status) {
+    this.disableStep = true;
     this.dataService.step(step).then(response => {
 
       this.time = moment.unix(response.time).local();
@@ -67,10 +76,12 @@ export class ControlPanelCardComponent implements OnInit {
       this.currentStatus = response.currentStatus;
       this.statistics = response.statistics;
 
-      if (response.trips) {
-        this.disableStep = true;
-        this.tripService.setTrips(response.trips);
-        setTimeout(() => this.disableStep = false, TRAIL_ANIMATION_FRAMES * TRAIL_ANIMATION_FRAME_RATE);
+      if (response.trips && response.trips.length > 0) {
+        this.tripService
+          .setTrips(response.trips)
+          .then(() => this.disableStep = false);
+      } else {
+        this.disableStep = false;
       }
 
       if (response.stations && !response.trips) {
@@ -93,6 +104,7 @@ export class ControlPanelCardComponent implements OnInit {
       this.nextStatus = response.nextStatus;
 
       this.settingsForm.setValue(response.settings);
+      this.settingsService.setSettings(response.settings);
       this.stationService.setStations(response.stations);
 
       if (this.nextStatus !== 'start') {

@@ -1,5 +1,14 @@
 <rbc-map></rbc-map>
-<div class="overlay">
-    <rbc-control-panel-card class="p-3 h-100" [style.width.px]="500"></rbc-control-panel-card>
+<div class="overlay pointer-events-none">
+    <ngx-loading [show]="loading" [config]="loadingConfig" [style.z-index]="1"></ngx-loading>
+    <rbc-control-panel-card class="p-3 h-100" [style.width.px]="500" [style.z-index]="2"></rbc-control-panel-card>
+    <div class="pointer-events-none flex-grow-1 d-flex align-items-end" [style.z-index]="2">
+        <div class="w-100 d-flex justify-content-end p-5">
+            <div class="text-right" *ngIf="progress">
+                <span class="d-block">Trips</span>
+                <h1 class="d-block">{{progress.current}}/{{progress.total}}</h1>
+            </div>
+        </div>
+    </div>
 </div>
 <router-outlet></router-outlet>

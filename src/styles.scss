@@ -7,3 +7,11 @@
 .o-scroll {
     overflow: scroll;
 }
+
+.pointer-events-none {
+    pointer-events: none !important;
+
+    * {
+        pointer-events: all;
+    }
+}

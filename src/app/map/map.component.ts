@@ -1,19 +1,16 @@
 import { Component, OnInit, ComponentFactoryResolver, ComponentFactory, ViewChild, ViewContainerRef, ComponentRef, HostListener } from '@angular/core';
-import * as mapbox from 'mapbox-gl';
 import { environment } from 'src/environments/environment';
 import { DataService } from '../data.service';
 import { Station } from 'src/models/station';
 import { MarkerComponent, MarkerProperties } from '../marker/marker.component';
-import * as turf from '@turf/turf';
 import { faCircle, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { Trip } from 'src/models/trip';
-import { TripService } from '../trip.service';
+import { TripService, TRIP_ANIMATION_FRAMES, TRIP_ANIMATION_FRAME_RATE } from '../trip.service';
 import { skip } from 'rxjs/operators';
 import { StationService } from '../station.service';
 import { Feature } from '@turf/turf';
-
-export const TRAIL_ANIMATION_FRAMES = 10;
-export const TRAIL_ANIMATION_FRAME_RATE = 500;
+import * as turf from '@turf/turf';
+import * as mapbox from 'mapbox-gl';
 
 @Component({
   selector: 'rbc-map',
@@ -42,16 +39,21 @@ export class MapComponent implements OnInit {
   mapStyle = 'mapbox://styles/mapbox/light-v10';
 
   stationIcon = faCircle;
-  stationColor = '#76DFFF';
+  stationColor = '#2d2d2d';
   stationOpacity = 0.6;
+  stationSize = 10;
+  stationScales = [40, 5];
 
   trailColor = '#3A73BD';
   trailWidth = 4;
+  trailSourceStationColor = '#7ac13b';
+  trailDestinationStationColor = '#f6685c';
+  trailStationScales = [30, 40];
 
   truckIcon = faTruck;
-  truckSize = 40;
+  truckSize = 35;
   truckColor = '#3A73BD';
-  truckOpacity = 0.9;
+  truckOpacity = 0.8;
 
   constructor(
     private dataService: DataService,
@@ -63,7 +65,9 @@ export class MapComponent implements OnInit {
     this.markerComponentFactory = this.resolver.resolveComponentFactory(MarkerComponent);
 
     this.tripService.trips$.subscribe(trips => {
-      this.drawTripDrawings(trips.map(trip => this.buildTripDrawing(trip)));
+      if (trips && trips.length > 0) {
+        this.drawTripDrawings(trips.map(trip => this.buildTripDrawing(trip)));
+      }
     });
 
     this.stationService.stations$.pipe(skip(1)).subscribe(stations => {
@@ -130,17 +134,16 @@ export class MapComponent implements OnInit {
   private drawStationMarkers(stations: Station[]) {
     const stationMarkers = stations.map(station => this.createStationMarker(station, {
       icon: this.stationIcon,
-      size: this.calculateStationSize(station.count),
+      size: this.calculateStationSize(this.stationScales[0], this.stationScales[1], station.count),
       color: this.stationColor,
-      opacity: this.stationOpacity,
-      label: station.count + ''
+      opacity: this.stationOpacity
     }));
     stationMarkers.forEach(stationMarker => stationMarker.marker.addTo(this.map));
     return stationMarkers;
   }
 
-  private calculateStationSize(count: number) {
-    return (count - this.minStationCount) * 30 / (this.maxStationCount - this.minStationCount) + 40;
+  private calculateStationSize(a: number, b: number, count: number) {
+    return (count - this.minStationCount) * a / (this.maxStationCount - this.minStationCount) + b;
   }
 
   private buildMap(center: mapbox.LngLat): mapbox.Map {
@@ -203,11 +206,19 @@ export class MapComponent implements OnInit {
     return truckMarker;
   }
 
-  private setStationMarkerCount(stationId: string, newCount: number) {
+  private updateStationMarkerProperties(stationId: string, properties: Partial<MarkerProperties>) {
     const sourceStationMarker = this.getStationMarker(stationId);
-    sourceStationMarker.component.instance.properties.size = this.calculateStationSize(newCount);
-    sourceStationMarker.component.instance.properties.label = newCount + '';
+    const markerComponent: MarkerComponent = sourceStationMarker.component.instance;
+    markerComponent.updateProperties(properties);
   }
+
+  // private setStationMarkerCount(stationId: string, newCount: number) {
+  //   const sourceStationMarker = this.getStationMarker(stationId);
+  //   const markerComponent: MarkerComponent = sourceStationMarker.component.instance;
+  //   markerComponent.properties.color = 'red';
+  //   markerComponent.properties.size = this.calculateStationSize(newCount);
+  //   markerComponent.properties.label = newCount + '';
+  // }
 
   buildTripDrawing(trip: Trip): TripDrawing {
     const source = this.stationsMap[trip.sourceId];
@@ -229,11 +240,18 @@ export class MapComponent implements OnInit {
       path,
       distance,
       truckMarker: this.drawTruck(source.coordinates, trip.count),
-      step: distance / TRAIL_ANIMATION_FRAMES
+      step: distance / TRIP_ANIMATION_FRAMES
     };
   }
 
   drawTripDrawings(drawings: TripDrawing[]) {
+
+    this.stationMarkers.forEach(station => {
+      station.component.instance.updateProperties({
+        hidden: true
+      });
+    });
+
     drawings.forEach(drawing => {
       this.map.addLayer({
         id: drawing.trip.id,
@@ -248,17 +266,27 @@ export class MapComponent implements OnInit {
           'line-dasharray': [2, 2]
         }
       });
+
+      // draw source stations
+      drawing.source.count -= drawing.trip.count;
+      this.updateStationMarkerProperties(drawing.source.id, {
+        color: this.trailSourceStationColor,
+        size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.source.count),
+        label: drawing.source.count + '',
+        hidden: false
+      });
+
+      // draw destination stations
+      this.updateStationMarkerProperties(drawing.destination.id, {
+        color: this.trailDestinationStationColor,
+        size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.destination.count),
+        label: drawing.destination.count + '',
+        hidden: false
+      });
     });
 
     let frame = 1;
     const interval = setInterval(() => {
-
-      if (frame === 2) {
-        drawings.forEach(drawing => {
-          drawing.source.count -= drawing.trip.count;
-          this.setStationMarkerCount(drawing.source.id, drawing.source.count);
-        });
-      }
 
       drawings.forEach(drawing => {
         const nextCoordinates = turf.along(drawing.path, drawing.step * frame, {
@@ -275,17 +303,22 @@ export class MapComponent implements OnInit {
 
       frame += 1;
 
-      if (frame > TRAIL_ANIMATION_FRAMES) {
+      if (frame > TRIP_ANIMATION_FRAMES) {
         clearInterval(interval);
 
         drawings.forEach(drawing => {
+
           drawing.destination.count += drawing.trip.count;
-          this.setStationMarkerCount(drawing.destination.id, drawing.destination.count);
+          this.updateStationMarkerProperties(drawing.destination.id, {
+            size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.destination.count),
+            label: drawing.destination.count + ''
+          });
+
           drawing.truckMarker.remove();
           this.map.removeLayer(drawing.trip.id);
         });
       }
-    }, TRAIL_ANIMATION_FRAME_RATE);
+    }, TRIP_ANIMATION_FRAME_RATE);
   }
 
 }

@@ -46,7 +46,7 @@
         <span>Current Time</span>
         <h1 class="font-weight-light">{{time | amDateFormat: 'YYYY/MM/DD, HH:ss:mm'}}</h1>
       </div>
-      <button class="btn btn-primary btn-block" (click)="step(nextStatus)" [disabled]="disableStep">{{statusLabels[nextStatus]}}</button>
+      <button class="btn btn-primary btn-block" (click)="step(nextStatus)" [disabled]="disableStep">{{statusLabels[nextStatus] || '...'}}</button>
       <button class="btn btn-primary btn-block" (click)="step('finish')" [disabled]="currentStatus !== 'rides'">Finish</button>
     </div>
     <div class="py-2" *ngIf="statistics">
@@ -60,6 +60,7 @@
           </tr>
         </tbody>
       </table>
+      <a class="btn btn-primary btn-block" *ngIf="currentStatus === 'finish'" [href]="exportUrl">Export</a>
     </div>
   </div>
 </div>

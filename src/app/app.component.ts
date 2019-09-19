@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { Trip } from 'src/models/trip';
+import { ngxLoadingAnimationTypes } from 'ngx-loading';
+import { DataService } from './data.service';
+import { TripService, ChunckedTripsProgress } from './trip.service';
 
 @Component({
   selector: 'rbc-root',
@@ -8,5 +10,27 @@ import { Trip } from 'src/models/trip';
 })
 export class AppComponent {
 
+  loading = true;
+
+  loadingConfig = {
+    animationType: ngxLoadingAnimationTypes.circle,
+    primaryColour: '#fffff',
+    secondaryColour: '#ccc'
+  };
+
+  progress: ChunckedTripsProgress;
+
+  constructor(
+    private dataService: DataService,
+    private tripService: TripService
+  ) {
+    this.dataService.loading$
+      .subscribe(loading => this.loading = loading);
+
+    this.tripService.chunkingProgress$.subscribe(progress => {
+      console.log(progress);
+      this.progress = progress;
+    });
+  }
 }
 

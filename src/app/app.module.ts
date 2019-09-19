@@ -10,6 +10,7 @@ import { MarkerComponent } from './marker/marker.component';
 import { ControlPanelCardComponent } from './control-panel-card/control-panel-card.component';
 import { MomentModule } from 'ngx-moment';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     HttpClientModule,
     FontAwesomeModule,
     MomentModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgxLoadingModule.forRoot({})
   ],
   providers: [],
   bootstrap: [AppComponent],
