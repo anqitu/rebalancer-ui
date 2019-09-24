@@ -2,10 +2,7 @@ import { Injectable } from '@angular/core';
 import { Trip } from 'src/models/trip';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as _ from 'lodash';
-
-export const TRIP_BATCH_SIZE = 20;
-export const TRIP_ANIMATION_FRAMES = 10;
-export const TRIP_ANIMATION_FRAME_RATE = 500;
+import { TRIP_ANIMATION_START_DELAY, TRIP_ANIMATION_FRAME_RATE, TRIP_ANIMATION_FRAMES, TRIP_BATCH_SIZE } from './constants';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +11,7 @@ export class TripService {
 
   private trips: BehaviorSubject<Trip[]>;
   public readonly trips$: Observable<Trip[]>;
-  private readonly batchDuration = TRIP_ANIMATION_FRAMES * TRIP_ANIMATION_FRAME_RATE;
+  private readonly batchDuration = TRIP_ANIMATION_FRAMES * TRIP_ANIMATION_FRAME_RATE * 1.5 + TRIP_ANIMATION_START_DELAY;
 
   private chunkingProgress: BehaviorSubject<ChunckedTripsProgress>;
   public readonly chunkingProgress$: Observable<ChunckedTripsProgress>;

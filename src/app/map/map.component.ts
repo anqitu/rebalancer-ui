@@ -5,12 +5,13 @@ import { Station } from 'src/models/station';
 import { MarkerComponent, MarkerProperties } from '../marker/marker.component';
 import { faCircle, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { Trip } from 'src/models/trip';
-import { TripService, TRIP_ANIMATION_FRAMES, TRIP_ANIMATION_FRAME_RATE } from '../trip.service';
 import { skip } from 'rxjs/operators';
 import { StationService } from '../station.service';
 import { Feature } from '@turf/turf';
 import * as turf from '@turf/turf';
 import * as mapbox from 'mapbox-gl';
+import { TRIP_ANIMATION_START_DELAY, TRIP_ANIMATION_FRAMES, TRIP_ANIMATION_FRAME_RATE } from '../constants';
+import { TripService } from '../trip.service';
 
 @Component({
   selector: 'rbc-map',
@@ -42,18 +43,18 @@ export class MapComponent implements OnInit {
   stationColor = '#2d2d2d';
   stationOpacity = 0.6;
   stationSize = 10;
-  stationScales = [40, 5];
+  stationScales = [25, 5];
 
   trailColor = '#3A73BD';
   trailWidth = 4;
   trailSourceStationColor = '#7ac13b';
   trailDestinationStationColor = '#f6685c';
-  trailStationScales = [30, 40];
+  trailStationScales = [30, 30];
 
   truckIcon = faTruck;
-  truckSize = 35;
-  truckColor = '#3A73BD';
-  truckOpacity = 0.8;
+  truckSize = 25;
+  truckColor = '#59aaff';
+  truckOpacity = 0.75;
 
   constructor(
     private dataService: DataService,
@@ -66,7 +67,7 @@ export class MapComponent implements OnInit {
 
     this.tripService.trips$.subscribe(trips => {
       if (trips && trips.length > 0) {
-        this.drawTripDrawings(trips.map(trip => this.buildTripDrawing(trip)));
+        this.drawTripDrawings(TRIP_ANIMATION_START_DELAY, trips.map(trip => this.buildTripDrawing(trip)));
       }
     });
 
@@ -192,15 +193,18 @@ export class MapComponent implements OnInit {
     } as Feature;
   }
 
-  drawTruck(coordinates: mapbox.LngLatLike, count: number) {
-    const truckComponent = this.createMarkerComponent({
+  buildTruckComponent(count: number): ComponentRef<MarkerComponent> {
+    return this.createMarkerComponent({
       icon: faTruck,
       size: this.truckSize,
       color: this.truckColor,
       opacity: this.truckOpacity,
-      label: count + ''
+      label: count + '',
+      hidden: true
     });
+  }
 
+  drawTruck(truckComponent: ComponentRef<MarkerComponent>, coordinates: mapbox.LngLatLike) {
     const truckMarker = this.createMarker(truckComponent.location.nativeElement, coordinates);
     truckMarker.addTo(this.map);
     return truckMarker;
@@ -232,6 +236,9 @@ export class MapComponent implements OnInit {
       destination.coordinates
     ]);
     const distance = turf.lineDistance(path, { units: 'kilometers' });
+
+    const truckComponent = this.buildTruckComponent(trip.count);
+
     return {
       trip,
       source,
@@ -239,12 +246,15 @@ export class MapComponent implements OnInit {
       trail,
       path,
       distance,
-      truckMarker: this.drawTruck(source.coordinates, trip.count),
+      truck: {
+        marker: this.drawTruck(truckComponent, source.coordinates),
+        component: truckComponent.instance
+      },
       step: distance / TRIP_ANIMATION_FRAMES
     };
   }
 
-  drawTripDrawings(drawings: TripDrawing[]) {
+  drawTripDrawings(startDelay: number, drawings: TripDrawing[]) {
 
     this.stationMarkers.forEach(station => {
       station.component.instance.updateProperties({
@@ -252,6 +262,7 @@ export class MapComponent implements OnInit {
       });
     });
 
+    const tripCoordinates = [];
     drawings.forEach(drawing => {
       this.map.addLayer({
         id: drawing.trip.id,
@@ -268,7 +279,6 @@ export class MapComponent implements OnInit {
       });
 
       // draw source stations
-      drawing.source.count -= drawing.trip.count;
       this.updateStationMarkerProperties(drawing.source.id, {
         color: this.trailSourceStationColor,
         size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.source.count),
@@ -283,42 +293,60 @@ export class MapComponent implements OnInit {
         label: drawing.destination.count + '',
         hidden: false
       });
+
+      tripCoordinates.push(drawing.destination.coordinates);
+      tripCoordinates.push(drawing.source.coordinates);
     });
 
-    let frame = 1;
-    const interval = setInterval(() => {
+    this.fitMapToBounds(this.buildMapBounds(tripCoordinates));
 
-      drawings.forEach(drawing => {
-        const nextCoordinates = turf.along(drawing.path, drawing.step * frame, {
-          units: 'kilometers'
-        }).geometry.coordinates as mapbox.LngLatLike;
+    setTimeout(() => {
+      let frame = 1;
+      const interval = setInterval(() => {
 
-        drawing.truckMarker.setLngLat(nextCoordinates);
-        drawing.trail.features[0].geometry.coordinates.push(nextCoordinates);
-
-        // update trail
-        const trailSource = this.map.getSource(drawing.trip.id) as mapbox.GeoJSONSource;
-        trailSource.setData(drawing.path);
-      });
-
-      frame += 1;
-
-      if (frame > TRIP_ANIMATION_FRAMES) {
-        clearInterval(interval);
+        if (frame === 1) {
+          drawings.forEach(drawing => {
+            drawing.truck.component.properties.hidden = false;
+            drawing.source.count -= drawing.trip.count;
+            this.updateStationMarkerProperties(drawing.source.id, {
+              size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.source.count),
+              label: drawing.source.count + ''
+            });
+          });
+        }
 
         drawings.forEach(drawing => {
+          const nextCoordinates = turf.along(drawing.path, drawing.step * frame, {
+            units: 'kilometers'
+          }).geometry.coordinates as mapbox.LngLatLike;
 
-          drawing.destination.count += drawing.trip.count;
-          this.updateStationMarkerProperties(drawing.destination.id, {
-            size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.destination.count),
-            label: drawing.destination.count + ''
-          });
+          drawing.truck.marker.setLngLat(nextCoordinates);
+          drawing.trail.features[0].geometry.coordinates.push(nextCoordinates);
 
-          drawing.truckMarker.remove();
-          this.map.removeLayer(drawing.trip.id);
+          // update trail
+          const trailSource = this.map.getSource(drawing.trip.id) as mapbox.GeoJSONSource;
+          trailSource.setData(drawing.path);
         });
-      }
-    }, TRIP_ANIMATION_FRAME_RATE);
+
+        frame += 1;
+
+        if (frame > TRIP_ANIMATION_FRAMES) {
+          clearInterval(interval);
+
+          drawings.forEach(drawing => {
+
+            drawing.destination.count += drawing.trip.count;
+            this.updateStationMarkerProperties(drawing.destination.id, {
+              size: this.calculateStationSize(this.trailStationScales[0], this.trailStationScales[1], drawing.destination.count),
+              label: drawing.destination.count + ''
+            });
+
+            drawing.truck.marker.remove();
+            this.map.removeLayer(drawing.trip.id);
+          });
+        }
+      }, TRIP_ANIMATION_FRAME_RATE);
+    }, startDelay);
   }
 
 }
@@ -330,7 +358,10 @@ interface TripDrawing {
   path: any;
   trail: any;
   distance: number;
-  truckMarker: mapbox.Marker;
+  truck: {
+    marker: mapbox.Marker;
+    component: MarkerComponent;
+  };
   step: number;
 }
 
