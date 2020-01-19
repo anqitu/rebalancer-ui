@@ -16,7 +16,8 @@ import { environment } from 'src/environments/environment';
 })
 export class ControlPanelCardComponent implements OnInit {
 
-  intervalOptions: Interval[] = [];
+  // intervalOptions: Interval[] = [];
+  predictionModeOptions: string[] = [];
 
   disableStep = false;
   currentStatus: Status;
@@ -44,9 +45,10 @@ export class ControlPanelCardComponent implements OnInit {
     private settingsService: SettingsService
   ) {
 
-    this.buildIntervalOptions(12);
+    // this.buildIntervalOptions(12);
+    this.setConfig();
     this.settingsForm = this.formBuilder.group({
-      intervalHour: [],
+      predictionMode: [],
       peakCost: [],
       offPeakCost: [],
       budgetPerCycle: [],
@@ -58,14 +60,20 @@ export class ControlPanelCardComponent implements OnInit {
     });
   }
 
-  buildIntervalOptions(maxHours: number) {
-    for (let hour = 1; hour < maxHours + 1; hour++) {
-      this.intervalOptions.push({
-        hours: hour,
-        label: `${hour} hour(s)`
-      });
-    }
+  setConfig() {
+    this.dataService.getConfig().then(response => {
+      this.predictionModeOptions = response.predictionMode;
+    });
   }
+
+  // buildIntervalOptions(maxHours: number) {
+  //   for (let hour = 1; hour < maxHours + 1; hour++) {
+  //     this.intervalOptions.push({
+  //       hours: hour,
+  //       label: `${hour} hour(s)`
+  //     });
+  //   }
+  // }
 
   step(step: Status) {
     this.disableStep = true;
@@ -103,7 +111,7 @@ export class ControlPanelCardComponent implements OnInit {
       this.currentStatus = response.currentStatus;
       this.nextStatus = response.nextStatus;
 
-      this.settingsForm.setValue(response.settings);
+      this.settingsForm.patchValue(response.settings);
       this.settingsService.setSettings(response.settings);
       this.stationService.setStations(response.stations);
 
@@ -115,7 +123,7 @@ export class ControlPanelCardComponent implements OnInit {
 
 }
 
-interface Interval {
-  hours: number;
-  label: string;
-}
+// interface Interval {
+//   hours: number;
+//   label: string;
+// }

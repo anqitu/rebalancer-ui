@@ -4,12 +4,6 @@
     <div class="py-2">
       <strong class="border-bottom py-1 mb-3 d-block">SETTINGS</strong>
       <form [formGroup]="settingsForm">
-        <div class="form-group">
-          <label for="interval-hour">Interval</label>
-          <select class="custom-select" formControlName="intervalHour" id="interval-hour">
-            <option [value]="option.hours" *ngFor="let option of intervalOptions">{{option.label}}</option>
-          </select>
-        </div>
         <div class="row">
           <div class="col">
             <div class="form-group">
@@ -37,6 +31,12 @@
               <input type="number" class="form-control" id="cost-coef" placeholder="Cost Coefficient" formControlName="costCoef">
             </div>
           </div>
+        </div>
+        <div class="form-group">
+          <label for="prediction-mode">Prediction Mode</label>
+          <select class="custom-select" formControlName="predictionMode" id="prediction-mode">
+            <option [value]="option" *ngFor="let option of predictionModeOptions">{{option}}</option>
+          </select>
         </div>
       </form>
     </div>

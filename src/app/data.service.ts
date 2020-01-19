@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { Status, StatusResponse } from 'src/models/status.response';
 import { SettingsService } from './settings.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { ConfigResponse } from 'src/models/config.response';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,14 @@ export class DataService {
   public getStatus(): Promise<StatusResponse> {
     this.loading.next(true);
     return this.http.get<StatusResponse>(`${environment.serverEndpoint}/status`).toPromise().then(res => {
+      this.loading.next(false);
+      return res;
+    });
+  }
+
+  public getConfig(): Promise<ConfigResponse> {
+    this.loading.next(true);
+    return this.http.get<ConfigResponse>(`${environment.serverEndpoint}/config`).toPromise().then(res => {
       this.loading.next(false);
       return res;
     });
