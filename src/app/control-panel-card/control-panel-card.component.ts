@@ -8,6 +8,7 @@ import { StationService } from '../station.service';
 import { StatisticItem } from 'src/models/statistic-item';
 import { SettingsService } from '../settings.service';
 import { environment } from 'src/environments/environment';
+import { StepResponse } from 'src/models/step.response';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -18,8 +19,11 @@ export class ControlPanelCardComponent implements OnInit {
 
   // intervalOptions: Interval[] = [];
   predictionModeOptions: string[] = [];
+  advanceStepOptions: AdvanceStep[] = [];
+  selectedAdvanceSteps = 1;
 
   disableStep = false;
+  disableAdvance = false;
   currentStatus: Status;
   nextStatus: Status;
   time = moment('12', 'HH');
@@ -46,13 +50,14 @@ export class ControlPanelCardComponent implements OnInit {
   ) {
 
     // this.buildIntervalOptions(12);
+    this.buildAdvanceStep(12);
     this.setConfig();
     this.settingsForm = this.formBuilder.group({
       predictionMode: [],
       peakCost: [],
       offPeakCost: [],
       budgetPerCycle: [],
-      costCoef: []
+      costCoef: [],
     });
 
     this.settingsForm.valueChanges.subscribe(() => {
@@ -75,32 +80,57 @@ export class ControlPanelCardComponent implements OnInit {
   //   }
   // }
 
+  buildAdvanceStep(maxSteps: number) {
+    for (let step = 1; step < maxSteps + 1; step++) {
+      this.advanceStepOptions.push({
+        steps: step,
+        label: `${step} step(s)`
+      });
+    }
+  }
+
+  updateStatistics(response: StepResponse) {
+    this.time = moment.unix(response.time).local();
+    this.nextStatus = response.nextStatus;
+    this.currentStatus = response.currentStatus;
+    this.statistics = response.statistics;
+
+    if (response.trips && response.trips.length > 0) {
+      this.tripService
+        .setTrips(response.trips)
+        .then(() => this.disableStep = false);
+    } else {
+      this.disableStep = false;
+    }
+
+    if (response.stations && !response.trips) {
+      this.stationService.updateStations(response.stations);
+    }
+
+    if (this.nextStatus === 'next-cycle') {
+      this.disableAdvance = false;
+    }
+
+    if (this.nextStatus !== 'start') {
+      this.settingsForm.disable();
+    } else {
+      this.settingsForm.enable();
+    }
+  }
+
   step(step: Status) {
     this.disableStep = true;
+    this.disableAdvance = true;
     this.dataService.step(step).then(response => {
+      this.updateStatistics(response);
+    });
+  }
 
-      this.time = moment.unix(response.time).local();
-      this.nextStatus = response.nextStatus;
-      this.currentStatus = response.currentStatus;
-      this.statistics = response.statistics;
-
-      if (response.trips && response.trips.length > 0) {
-        this.tripService
-          .setTrips(response.trips)
-          .then(() => this.disableStep = false);
-      } else {
-        this.disableStep = false;
-      }
-
-      if (response.stations && !response.trips) {
-        this.stationService.updateStations(response.stations);
-      }
-
-      if (this.nextStatus !== 'start') {
-        this.settingsForm.disable();
-      } else {
-        this.settingsForm.enable();
-      }
+  advance() {
+    this.disableStep = true;
+    this.disableAdvance = true;
+    this.dataService.advance(this.selectedAdvanceSteps, this.nextStatus).then(response => {
+      this.updateStatistics(response);
     });
   }
 
@@ -127,3 +157,8 @@ export class ControlPanelCardComponent implements OnInit {
 //   hours: number;
 //   label: string;
 // }
+
+interface AdvanceStep {
+  steps: number;
+  label: string;
+}

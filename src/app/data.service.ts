@@ -49,4 +49,15 @@ export class DataService {
       return res;
     });
   }
+
+  public advance(advanceSteps: number, stepStatus: Status): Promise<StepResponse> {
+    this.loading.next(true);
+    const body = stepStatus === 'start' ? {
+      settings: this.settingsService.getSettings()
+    } : {};
+    return this.http.post<StepResponse>(`${environment.serverEndpoint}/advance/${advanceSteps}`, body).toPromise().then(res => {
+      this.loading.next(false);
+      return res;
+    });
+  }
 }

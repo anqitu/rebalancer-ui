@@ -47,7 +47,15 @@
         <h1 class="font-weight-light">{{time | amDateFormat: 'YYYY/MM/DD, HH:ss:mm'}}</h1>
       </div>
       <button class="btn btn-primary btn-block" (click)="step(nextStatus)" [disabled]="disableStep">{{statusLabels[nextStatus] || '...'}}</button>
-      <button class="btn btn-primary btn-block" (click)="step('finish')" [disabled]="currentStatus !== 'rides'">Finish</button>
+      <button class="btn btn-primary btn-block" (click)="step('finish')" [disabled]="disableStep || disableAdvance || currentStatus !== 'rides' || currentStatus === 'start'">Finish</button>
+      <div class="input-group mt-3">
+        <select class="custom-select" [(ngModel)]="selectedAdvanceSteps">
+          <option [value]="advanceStep.steps" *ngFor="let advanceStep of advanceStepOptions">{{advanceStep.label}}</option>
+        </select>
+        <div class="input-group-append">
+          <button class="btn btn-primary" (click)="advance()" [disabled]="disableAdvance" type="button">Advance</button>
+        </div>
+      </div>        
     </div>
     <div class="py-2" *ngIf="statistics">
       <strong class="border-bottom py-1 mb-3 d-block">STATISTICS</strong>

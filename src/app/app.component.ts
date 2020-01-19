@@ -28,7 +28,6 @@ export class AppComponent {
       .subscribe(loading => this.loading = loading);
 
     this.tripService.chunkingProgress$.subscribe(progress => {
-      console.log(progress);
       this.progress = progress;
     });
   }
