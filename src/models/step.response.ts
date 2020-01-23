@@ -9,5 +9,5 @@ export interface StepResponse {
   nextStatus: Status;
   statistics?: StatisticItem[];
   stations?: StationUpdate[];
-  trips?: Trip[];
+  trips?: Trip[][];
 }

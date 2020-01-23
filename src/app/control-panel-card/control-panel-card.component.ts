@@ -9,6 +9,7 @@ import { StatisticItem } from 'src/models/statistic-item';
 import { SettingsService } from '../settings.service';
 import { environment } from 'src/environments/environment';
 import { StepResponse } from 'src/models/step.response';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -46,7 +47,8 @@ export class ControlPanelCardComponent implements OnInit {
     private dataService: DataService,
     private tripService: TripService,
     private stationService: StationService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private toastr: ToastrService,
   ) {
 
     // this.buildIntervalOptions(12);
@@ -95,6 +97,10 @@ export class ControlPanelCardComponent implements OnInit {
     this.currentStatus = response.currentStatus;
     this.statistics = response.statistics;
 
+    if (response.trips && response.trips.length === 0) {
+      this.showNoScheduleToast();
+    }
+
     if (response.trips && response.trips.length > 0) {
       this.tripService
         .setTrips(response.trips)
@@ -131,6 +137,12 @@ export class ControlPanelCardComponent implements OnInit {
     this.disableAdvance = true;
     this.dataService.advance(this.selectedAdvanceSteps, this.nextStatus).then(response => {
       this.updateStatistics(response);
+    });
+  }
+
+  showNoScheduleToast() {
+    this.toastr.info('No Rebalancing Trips Scheduled', '', {
+      timeOut: 3000
     });
   }
 

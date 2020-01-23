@@ -24,42 +24,43 @@ export class TripService {
     this.chunkingProgress$ = this.chunkingProgress.asObservable();
   }
 
-  public async setTrips(trips: Trip[]) {
-    const chunks = _.chunk(trips, TRIP_BATCH_SIZE);
-    this.trips.next(chunks[0]);
-    let tripsDone = chunks[0].length;
-    if (chunks.length > 1) {
-      this.chunkingProgress.next({
-        current: tripsDone,
-        total: trips.length
-      });
-    }
+  public async setTrips(trips: Trip[][]) {
+    // const chunks = _.chunk(trips, TRIP_BATCH_SIZE);
+    this.trips.next(trips[0]);
+    let tripsDone = trips[0].length;
+    const tripsTotal = _.flatten(trips).length;
+    // if (trips.length > 1) {
+    this.chunkingProgress.next({
+      current: tripsDone,
+      total: tripsTotal
+    });
+    // }
 
     return new Promise(resolve => {
       let i = 1;
 
       const interval = setInterval(() => {
 
-        if (i === chunks.length) {
+        if (i === trips.length) {
           clearInterval(interval);
 
-          if (chunks.length > 1) {
+          if (trips.length > 1) {
             this.chunkingProgress.next(undefined);
           }
 
           return resolve();
         }
 
-        const currentChunk = chunks[i];
+        const currentChunk = trips[i];
 
         tripsDone += currentChunk.length;
 
-        if (chunks.length > 1) {
-          this.chunkingProgress.next({
-            current: tripsDone,
-            total: trips.length
-          });
-        }
+        // if (trips.length > 1) {
+        this.chunkingProgress.next({
+          current: tripsDone,
+          total: tripsTotal
+        });
+        // }
 
         this.trips.next(currentChunk);
         i += 1;
