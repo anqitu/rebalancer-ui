@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SimulationRecordResponse } from 'src/models/simulation-record-response';
 import { faDownload, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { SimulationRecord } from 'src/models/simulation-record';
 import { environment } from 'src/environments/environment';
@@ -27,17 +26,12 @@ export class RecordsTableComponent implements OnInit {
   exportUrl = `${environment.serverEndpoint}/download`;
   deleteUrl = `${environment.serverEndpoint}/delete`;
 
-  @Input() public simulationRecordResponse: SimulationRecordResponse;
-  @Output() passEntry: EventEmitter<any> = new EventEmitter();
-
   constructor(
     private model: NgbActiveModal,
     private dataService: DataService) {
   }
 
   ngOnInit(): void {
-    this.recordData = this.simulationRecordResponse.data;
-    this.headers = this.simulationRecordResponse.headers;
     this.collectionSize = this.recordData.length;
   }
 
@@ -46,9 +40,9 @@ export class RecordsTableComponent implements OnInit {
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
 
-  delete(recordId): void {
-    this.dataService.deleteSimulationRecords(recordId).then( res =>
-      this.passEntry.emit(res));
+  delete(recordId: number): void {
+    this.recordData.splice(this.recordData.findIndex(r => r.id === recordId), 1);
+    this.dataService.deleteSimulationRecords(recordId);
   }
 
   close() {

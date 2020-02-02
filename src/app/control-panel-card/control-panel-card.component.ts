@@ -145,11 +145,9 @@ export class ControlPanelCardComponent implements OnInit {
         size: 'xl',
         centered: true
       });
-      modalRef.componentInstance.simulationRecordResponse = response;
-      modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
-        this.openRecordsTableModal();
-        modalRef.close();
-      });
+      const recordsTable: RecordsTableComponent = modalRef.componentInstance;
+      recordsTable.recordData = response.data;
+      recordsTable.headers = response.headers;
     });
   }
 
