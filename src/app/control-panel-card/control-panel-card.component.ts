@@ -12,6 +12,7 @@ import { StepResponse } from 'src/models/step.response';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RecordsTableComponent } from '../records-table/records-table.component';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -105,7 +106,7 @@ export class ControlPanelCardComponent implements OnInit {
       this.stationService.updateStations(response.stations);
     }
 
-    if (this.nextStatus === 'next-cycle') {
+    if (this.nextStatus === 'next-cycle' || this.nextStatus === 'start') {
       this.disableAdvance = false;
     }
 
@@ -145,6 +146,10 @@ export class ControlPanelCardComponent implements OnInit {
         centered: true
       });
       modalRef.componentInstance.simulationRecordResponse = response;
+      modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+        this.openRecordsTableModal();
+        modalRef.close();
+      });
     });
   }
 

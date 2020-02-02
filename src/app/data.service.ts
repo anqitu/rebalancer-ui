@@ -48,6 +48,14 @@ export class DataService {
     });
   }
 
+  public deleteSimulationRecords(recordId): Promise<{}> {
+    // this.loading.next(true);
+    return this.http.get<{}>(`${environment.serverEndpoint}/delete/${recordId}`).toPromise().then(res => {
+      // this.loading.next(false);
+      return res;
+    });
+  }
+
   public step(step: Status): Promise<StepResponse> {
     this.loading.next(true);
     const body = step === 'start' ? {

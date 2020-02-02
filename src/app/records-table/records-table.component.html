@@ -17,6 +17,7 @@
       <td *ngFor="let recordItem of record.data" class="align-middle">{{recordItem.value}}</td>
       <td class="align-middle">
         <a [href]="exportUrl + '/' + record.id"><fa-icon [icon]="downloadIcon"></fa-icon></a>
+        <a (click)="delete(record.id)" class="deleteIcon"><fa-icon [icon]="deleteIcon"></fa-icon></a>
       </td>
     </tr>
     </tbody>
