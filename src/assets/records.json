@@ -1,0 +1,110 @@
+[
+  [
+    {
+      "name": "Time", 
+      "value": "2020/02/01 09:51:47"
+    }, 
+    {
+      "name": "Peak Cost", 
+      "value": 1
+    }, 
+    {
+      "name": "Off-Peak Cost", 
+      "value": 1
+    }, 
+    {
+      "name": "Budget Per Cycle", 
+      "value": 1500
+    }, 
+    {
+      "name": "Cost Coef", 
+      "value": 0.2
+    }, 
+    {
+      "name": "Prediction Mode", 
+      "value": "Past 7 Days Moving Average"
+    }, 
+    {
+      "name": "Cycle Count", 
+      "value": 2
+    }, 
+    {
+      "name": "Simulation Hours", 
+      "value": 6
+    }, 
+    {
+      "name": "Moved Bike Total Count", 
+      "value": 1462
+    }, 
+    {
+      "name": "Rebalanced Bike Total Count", 
+      "value": 36
+    }, 
+    {
+      "name": "Time Average Cost", 
+      "value": 0.0
+    }, 
+    {
+      "name": "Time Average Conditional Drift", 
+      "value": 4591.5
+    }, 
+    {
+      "name": "Objective Function", 
+      "value": 4591.5
+    }
+  ], 
+  [
+    {
+      "name": "Time", 
+      "value": "2020/02/01 09:51:47"
+    }, 
+    {
+      "name": "Peak Cost", 
+      "value": 1
+    }, 
+    {
+      "name": "Off-Peak Cost", 
+      "value": 1
+    }, 
+    {
+      "name": "Budget Per Cycle", 
+      "value": 1500
+    }, 
+    {
+      "name": "Cost Coef", 
+      "value": 0.2
+    }, 
+    {
+      "name": "Prediction Mode", 
+      "value": "Past 7 Days Moving Average"
+    }, 
+    {
+      "name": "Cycle Count", 
+      "value": 2
+    }, 
+    {
+      "name": "Simulation Hours", 
+      "value": 6
+    }, 
+    {
+      "name": "Moved Bike Total Count", 
+      "value": 1462
+    }, 
+    {
+      "name": "Rebalanced Bike Total Count", 
+      "value": 36
+    }, 
+    {
+      "name": "Time Average Cost", 
+      "value": 0.0
+    }, 
+    {
+      "name": "Time Average Conditional Drift", 
+      "value": 4591.5
+    }, 
+    {
+      "name": "Objective Function", 
+      "value": 4591.5
+    }
+  ]
+]

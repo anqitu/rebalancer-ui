@@ -1,0 +1,32 @@
+<div class="modal-header text-center col-12 border-0">
+  <h4 class="modal-title w-100 pl-5">Simulation Records</h4>
+  <button type="button" class="close border-0 close-button" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body pt-0">
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col" *ngFor="let header of headers">{{header}}</th>
+      <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let record of records">
+      <td *ngFor="let recordItem of record.data" class="align-middle">{{recordItem.value}}</td>
+      <td class="align-middle">
+        <a [href]="exportUrl + '/' + record.id"><fa-icon [icon]="downloadIcon"></fa-icon></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-between p-2">
+    <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
+    </ngb-pagination>
+  
+    <select class="custom-select" style="width: auto" [(ngModel)]="pageSize">
+      <option [ngValue]="pageSize" *ngFor="let pageSize of pageSizeOptions">{{pageSize}} items per page</option>
+    </select>
+  </div>
+</div>
