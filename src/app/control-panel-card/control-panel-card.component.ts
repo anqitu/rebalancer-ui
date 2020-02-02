@@ -10,6 +10,8 @@ import { SettingsService } from '../settings.service';
 import { environment } from 'src/environments/environment';
 import { StepResponse } from 'src/models/step.response';
 import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RecordsTableComponent } from '../records-table/records-table.component';
 
 @Component({
   selector: 'rbc-control-panel-card',
@@ -49,9 +51,8 @@ export class ControlPanelCardComponent implements OnInit {
     private stationService: StationService,
     private settingsService: SettingsService,
     private toastr: ToastrService,
+    private modalService: NgbModal,
   ) {
-
-    // this.buildIntervalOptions(12);
     this.buildAdvanceStep(12);
     this.setConfig();
     this.settingsForm = this.formBuilder.group({
@@ -72,15 +73,6 @@ export class ControlPanelCardComponent implements OnInit {
       this.predictionModeOptions = response.predictionMode;
     });
   }
-
-  // buildIntervalOptions(maxHours: number) {
-  //   for (let hour = 1; hour < maxHours + 1; hour++) {
-  //     this.intervalOptions.push({
-  //       hours: hour,
-  //       label: `${hour} hour(s)`
-  //     });
-  //   }
-  // }
 
   buildAdvanceStep(maxSteps: number) {
     for (let step = 1; step < maxSteps + 1; step++) {
@@ -146,6 +138,16 @@ export class ControlPanelCardComponent implements OnInit {
     });
   }
 
+  openRecordsTableModal() {
+    this.dataService.getSimulationRecords().then(response => {
+      const modalRef = this.modalService.open(RecordsTableComponent, {
+        size: 'xl',
+        centered: true
+      });
+      modalRef.componentInstance.simulationRecordResponse = response;
+    });
+  }
+
   ngOnInit() {
     this.dataService.getStatus().then(response => {
       this.time = moment.unix(response.time).local();
@@ -164,12 +166,6 @@ export class ControlPanelCardComponent implements OnInit {
   }
 
 }
-
-// interface Interval {
-//   hours: number;
-//   label: string;
-// }
-
 interface AdvanceStep {
   steps: number;
   label: string;

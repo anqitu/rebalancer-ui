@@ -22,7 +22,7 @@ export class AppComponent {
 
   constructor(
     private dataService: DataService,
-    private tripService: TripService
+    private tripService: TripService,
   ) {
     this.dataService.loading$
       .subscribe(loading => this.loading = loading);

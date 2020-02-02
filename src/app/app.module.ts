@@ -9,17 +9,20 @@ import { faMapMarker } from '@fortawesome/free-solid-svg-icons';
 import { MarkerComponent } from './marker/marker.component';
 import { ControlPanelCardComponent } from './control-panel-card/control-panel-card.component';
 import { MomentModule } from 'ngx-moment';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxLoadingModule } from 'ngx-loading';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { RecordsTableComponent } from './records-table/records-table.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
     MarkerComponent,
-    ControlPanelCardComponent
+    ControlPanelCardComponent,
+    RecordsTableComponent
   ],
   imports: [
     BrowserModule,
@@ -27,14 +30,16 @@ import { ToastrModule } from 'ngx-toastr';
     HttpClientModule,
     FontAwesomeModule,
     MomentModule,
+    FormsModule,
     ReactiveFormsModule,
     NgxLoadingModule.forRoot({}),
     BrowserAnimationsModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [MarkerComponent]
+  entryComponents: [MarkerComponent, RecordsTableComponent]
 })
 export class AppModule {
 

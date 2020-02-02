@@ -6,6 +6,7 @@ import { Status, StatusResponse } from 'src/models/status.response';
 import { SettingsService } from './settings.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { ConfigResponse } from 'src/models/config.response';
+import { SimulationRecordResponse } from 'src/models/simulation-record-response';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +36,14 @@ export class DataService {
     this.loading.next(true);
     return this.http.get<ConfigResponse>(`${environment.serverEndpoint}/config`).toPromise().then(res => {
       this.loading.next(false);
+      return res;
+    });
+  }
+
+  public getSimulationRecords(): Promise<SimulationRecordResponse> {
+    // this.loading.next(true);
+    return this.http.get<SimulationRecordResponse>(`${environment.serverEndpoint}/records`).toPromise().then(res => {
+      // this.loading.next(false);
       return res;
     });
   }
