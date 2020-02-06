@@ -1,5 +1,5 @@
 <div class="modal-header text-center col-12 border-0">
-  <h4 class="modal-title w-100 pl-5">Simulation Records</h4>
+  <h5 class="modal-title w-100 pl-5">Simulation Records</h5>
   <button type="button" class="close border-0 close-button" aria-label="Close" (click)="close()">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -8,13 +8,13 @@
   <table class="table table-striped">
     <thead>
     <tr>
-      <th scope="col" *ngFor="let header of headers">{{header}}</th>
+      <th scope="col" *ngFor="let header of headers" class="font-weight-bold">{{header}}</th>
       <th scope="col"></th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let record of records">
-      <td *ngFor="let recordItem of record.data" class="align-middle">{{recordItem.value}}</td>
+      <td *ngFor="let recordItem of record.data" class="align-middle font-weight-light">{{recordItem.value}}</td>
       <td class="align-middle">
         <a [href]="exportUrl + '/' + record.id"><fa-icon [icon]="downloadIcon"></fa-icon></a>
         <a (click)="delete(record.id)" class="deleteIcon"><fa-icon [icon]="deleteIcon"></fa-icon></a>
